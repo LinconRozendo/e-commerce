@@ -52,6 +52,7 @@ DB_PASS=sua_senha
 DB_NAME=database
 DB_PORT=5432
 JWT_SECRET=chave
+PORT=3000
 ```
 4. Inicie o servidor:
 
@@ -81,4 +82,5 @@ npm install
 ```bash
 npm run dev
 # O site rodará em http://localhost:3001
+
 ```
