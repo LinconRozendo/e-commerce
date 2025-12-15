@@ -1,0 +1,221 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API E-Commerce",
+    "description": "API do E-Commerce",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor Local"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/sessions": {
+      "post": {
+        "summary": "Login de Usuário",
+        "tags": ["Autenticação"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "vendedor@teste.com" },
+                  "password": { "type": "string", "example": "123456" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login realizado com sucesso, retorna o token" }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "summary": "Listar Produtos",
+        "tags": ["Produtos"],
+        "parameters": [
+          { "in": "query", "name": "page", "schema": { "type": "integer" }, "description": "Página atual" },
+          { "in": "query", "name": "limit", "schema": { "type": "integer" }, "description": "Itens por página" },
+          { "in": "query", "name": "search", "schema": { "type": "string" }, "description": "Filtrar por nome" }
+        ],
+        "responses": {
+          "200": { "description": "Lista de produtos paginada" }
+        }
+      },
+      "post": {
+        "summary": "Criar Produto (Manual)",
+        "tags": ["Produtos"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "price": { "type": "number" },
+                  "url": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Produto criado" },
+          "403": { "description": "Apenas vendedores" }
+        }
+      }
+    },
+    "/products/upload": {
+      "post": {
+        "summary": "Importação em Massa (CSV)",
+        "tags": ["Produtos"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": { "type": "string", "format": "binary" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Produtos importados" }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "summary": "Detalhes do Produto",
+        "tags": ["Produtos"],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Dados do produto" } }
+      },
+      "delete": {
+        "summary": "Remover Produto",
+        "tags": ["Produtos"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "204": { "description": "Produto removido" } }
+      }
+    },
+    "/cart": {
+      "get": {
+        "summary": "Ver Carrinho",
+        "tags": ["Carrinho"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Itens do carrinho e total" } }
+      },
+      "post": {
+        "summary": "Adicionar Item",
+        "tags": ["Carrinho"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "productId": { "type": "integer", "example": 1 } }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Item adicionado" } }
+      }
+    },
+    "/cart/checkout": {
+      "post": {
+        "summary": "Finalizar Compra",
+        "tags": ["Carrinho"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Compra finalizada, carrinho limpo" } }
+      }
+    },
+    "/cart/{id}": {
+      "delete": {
+        "summary": "Remover Item do Carrinho",
+        "tags": ["Carrinho"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "description": "ID do Produto", "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Item removido" } }
+      }
+    },
+    "/favorites": {
+      "get": {
+        "summary": "Listar Favoritos",
+        "tags": ["Favoritos"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Lista de produtos favoritos" } }
+      }
+    },
+    "/favorites/{id}": {
+      "post": {
+        "summary": "Favoritar Produto",
+        "tags": ["Favoritos"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "201": { "description": "Favoritado" } }
+      },
+      "delete": {
+        "summary": "Desfavoritar Produto",
+        "tags": ["Favoritos"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "204": { "description": "Removido dos favoritos" } }
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "summary": "Métricas do Vendedor",
+        "tags": ["Dashboard"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Estatísticas de vendas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total_products": { "type": "integer" },
+                    "total_sold": { "type": "integer" },
+                    "total_revenue": { "type": "number" },
+                    "best_selling_product": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "summary": "Histórico de Pedidos",
+        "tags": ["Pedidos"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "Lista de pedidos realizados" } }
+      }
+    }
+  }
+}
