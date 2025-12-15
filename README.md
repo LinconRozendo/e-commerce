@@ -8,7 +8,6 @@ Plataforma completa de E-cCommerce com sistema que permite a navegação por vit
 - **Next.js 14** (App Router)
 - **TailwindCSS** (Estilização)
 - **Axios** (Consumo de API)
-- **Context API** (Gerenciamento de Estado: Auth e Cart)
 
 ### Back-end
 - **Node.js & Express**
@@ -84,3 +83,4 @@ npm run dev
 # O site rodará em http://localhost:3001
 
 ```
+
